@@ -11,7 +11,7 @@ public class FileData {
     int recordSize;
     static RandomAccessFile configFile;
     static RandomAccessFile dataFile;
-    boolean success;
+    boolean success, adding;
     String[] fieldNames = { "ID", "Region", "State", "Code", "Name", "Type", "Visitors" };
     int[] fieldSizes = { 10, 2, 2, 4, 90, 40, 11 };
     static Scanner input = new Scanner(System.in);
@@ -23,6 +23,7 @@ public class FileData {
         dataFile = null;
         recordSize = 167;
         success = false;
+        adding = false;
     }
 
     // Choice 1
@@ -39,7 +40,8 @@ public class FileData {
     }
 
     // Reading in the file name for the new database
-    void readInFile(String fileName) {
+    void readInFile(String fileName)
+    {
         int numRows = 0;
 
         try {
@@ -50,12 +52,14 @@ public class FileData {
             String line = null;
             FileWriter dataFile = new FileWriter(new File(fileName + ".data")); // Writing the data file
 
-            while ((line = file.readLine()) != null) {
+            while ((line = file.readLine()) != null) 
+            {
                 String temp, begin, last;
 
                 // Getting rid of entries that have commas within the field
                 // This helps separate the data correctly
-                if (line.contains("\"")) {
+                if (line.contains("\"")) 
+                {
                     temp = line;
                     int holder1 = (temp.indexOf("\""));
                     int holder2 = (temp.lastIndexOf("\"") + 1);
@@ -68,8 +72,8 @@ public class FileData {
 
                 // Separating the different fields
                 String[] lineObj = line.split(",");
-                // writeToFile(lineObj);
-                for (int i = 0; i < lineObj.length; i++) {
+                for (int i = 0; i < lineObj.length; i++) 
+                {
                     int diff = 0;
 
                     if (lineObj[i].contains(" "))
@@ -109,10 +113,39 @@ public class FileData {
 
         } catch (Exception e) {
             System.out.println("Sorry could not open file\n" + "Terminating Program...");
-            // e.printStackTrace();
+            e.printStackTrace();
             System.exit(0);
         }
     }
+
+    // void writeToFile(FileWriter dataFile, String [] lineObj) throws IOException
+    // {
+    //     String newRecord = "";
+    //     // dataFile = new RandomAccessFile(filename + ".data", "rw");
+    //     System.out.println("in the resize");
+    //     for (int i = 0; i < lineObj.length; i++) 
+    //     {
+    //         int diff = 0;
+
+    //         if (lineObj[i].contains(" "))
+    //             lineObj[i] = lineObj[i].replace(' ', '_');
+
+    //         if (lineObj[i].length() < fieldSizes[i])
+    //         {// Making the fields their required sizes with spaces as holders
+    //             diff = fieldSizes[i] - lineObj[i].length();
+
+    //         for (int j = 0; j < diff; j++)
+    //             lineObj[i] = lineObj[i] + " ";
+    //         }
+    //         if (lineObj[i].length() > fieldSizes[i]) // Making the field smaller if larger than the fieldsize
+    //                 lineObj[i] = lineObj[i].substring(0, fieldSizes[i]);
+            
+            
+    //         newRecord = newRecord + lineObj[i] + " ";
+            
+    //     }
+    //     dataFile.write(newRecord + "\n");
+    // }
 
     void reorganize() throws IOException
     {
@@ -131,9 +164,6 @@ public class FileData {
                 System.out.println("In the if: " + pos);
                 System.out.println(line);
 
-                // dataFile.seek(0);
-                // dataFile.skipBytes(((recordPos) * recordSize));
-
                 dataFile.seek(0);
                 dataFile.skipBytes(((pos) * recordSize));
                 String temp = "";
@@ -143,8 +173,6 @@ public class FileData {
                 }
                 byte[] blank = temp.getBytes();
                 dataFile.write(blank);
-                // System.out.println("In the if statement");
-                // System.out.println(pos);
                 dataFile.seek(0);
                 dataFile.skipBytes(((pos + 1) * recordSize));
             }
@@ -212,7 +240,8 @@ public class FileData {
                 String recordPos = input.nextLine();
                 System.out.println("Searching..." + "\n");
 
-                if (getRecordDisplay(dataFile, search(dataFile, recordPos))) {
+                if (getRecord(dataFile, search(dataFile, recordPos))) 
+                {
                     System.out.println("Record found:" + "\n");
 
                     String[] dataInfo = record.split(" ");
@@ -223,7 +252,9 @@ public class FileData {
                     }
                     System.out.println("\n");
                     return recordPos;
-                } else {
+                } 
+                else 
+                {
                     System.out.println("Could not get Record " + recordPos);
                     System.out.println("Record out of range\n\n");
                     return null;
@@ -232,7 +263,8 @@ public class FileData {
                 System.out.println("Something went wrong");
                 e.printStackTrace();
             }
-        } else
+        } 
+        else
             System.out.println("Whoops, please open a database first\n");
             return null;
     }
@@ -246,33 +278,57 @@ public class FileData {
         int high = Integer.parseInt(configFile.readLine()); // Grabbing the number of rows from the config file
         int middle = 0;
         boolean found = false;
+        int count = 0;
 
-        while (!found && (high >= low)) {
+        while (!found && (high >= low)) 
+        {
             middle = (low + high) / 2;
-            success = getRecordDisplay(dataFile, middle);
+            success = getRecord(dataFile, middle);
+
+            
+
+            while(((record.contains("//")) || record.contains("missing") )) //&& (middle < (high - 1))
+            {
+                middle++;
+                success = getRecord(dataFile, middle);
+            }
 
             System.out.println("middle: " + middle);
             System.out.println("high: " + high);
             System.out.println("low: " + low);
 
-            while(((record.contains("//")) || record.contains("missing") && (middle < (high - 1))))
-            {
-                middle++;
-                success = getRecordDisplay(dataFile, middle);
-            }
-            
             String MiddleId[] = record.split(" ");
-    
-            if(MiddleId[0].contains("missing"))
+            System.out.println(MiddleId[0]);
+
+            if(MiddleId[0].contains("missing") || MiddleId[0].contains("//"))
                     return -1;
+
 
             int midId = Integer.parseInt(MiddleId[0]);
             int lookId = Integer.parseInt(ID);
+
+            if((high - middle <= 3) && (middle - low <= 3) && adding)
+            {
+                System.out.println("in the else if with high - middle and middle - low ");
+
+                    return middle;
+            }
+            else if((high - middle <= 3) && adding)
+            {
+                System.out.println("This is count: " + count);
+                if(count == 4)
+                    return middle;
+                count++;
+            }
 
             if (midId == lookId)
                 found = true;
             else if (midId < lookId)
                 low = middle + 1;
+            else if((high - middle <= 3) && (middle - low <= 3))
+            {
+                return -1;
+            }
             else
                 high = middle - 1;
         }
@@ -283,18 +339,16 @@ public class FileData {
     }
 
     // Grabbing the record
-    // I might make this a dual function rather than a getrecord for display and
-    // getrecord for insert or something. will see!
-    boolean getRecordDisplay(RandomAccessFile dataFile, int recordNum) throws IOException 
+    boolean getRecord(RandomAccessFile dataFile, int recordPos) throws IOException 
     {
         configFile.seek(0);
         int numRows = Integer.parseInt(configFile.readLine());
         success = false;
 
-        if ((recordNum >= 0) && (recordNum < numRows)) 
+        if ((recordPos >= 0) && (recordPos < numRows)) 
         {
             dataFile.seek(0);
-            dataFile.skipBytes(recordNum * recordSize);
+            dataFile.skipBytes(recordPos * recordSize);
             record = dataFile.readLine().replaceAll("\\s+", " ");
             success = true;
         }
@@ -363,7 +417,7 @@ public class FileData {
                     }
                     if (pos != 0) {
                         dataFile.seek(0);
-                        dataFile.skipBytes(((recordPos + 1) * recordSize) + pos);
+                        dataFile.skipBytes(((recordPos) * recordSize) + pos);
 
                         System.out.println("Enter in the new value for " + field);
                         String temp = input.nextLine();
@@ -384,7 +438,7 @@ public class FileData {
                             temp = temp.substring(0, maxLength);
 
                         byte[] words = temp.getBytes();
-                        dataFile.write(words);
+                        dataFile.write(words); // I can just change this to writeBytes() instead of having two lines
                     }
                 }
             }
@@ -403,9 +457,9 @@ public class FileData {
 
             for (int i = 0; pos < 10; i++) 
             {
-                getRecordDisplay(dataFile, i);
+                getRecord(dataFile, i);
                 while(record.contains("//") || record.contains("missing")){
-                    getRecordDisplay(dataFile, i++);
+                    getRecord(dataFile, i++);
                 }
 
                 String[] dataInfo = record.split(" ");
@@ -429,23 +483,88 @@ public class FileData {
 
     void add() throws IOException 
     {
-        System.out.println("Please enter in the Id number for the new addition");
-        String recordNum = input.nextLine();
-        int id = Integer.parseInt(recordNum);
-        if(!getRecordDisplay(dataFile, id))
+        if(dataFile != null)
         {
-            System.out.println("Please enter in the Region, State, Code, Name, Type, and Visitors in that order.\n" + "After each field press enter");
-            String region = input.nextLine();
-            String state = input.nextLine();
-            String code = input.nextLine();
-            String name = input.nextLine();
-            String type = input.nextLine();
-            String visitors = input.nextLine();
+            adding = true;
+            System.out.println("Please enter in the Id number for the new addition");
+            String recordNum = input.nextLine();
+            int id = Integer.parseInt(recordNum);
+            int diff = 0;
+            int nextRecordPos = 0; 
+            // configFile.seek(0);
+            // int numRows = Integer.parseInt(configFile.readLine());
 
-            String line = region + " " + state + " " + code + " " + name + " " + type + " " + visitors;
-            System.out.println(line);
+        
+            if(!getRecord(dataFile, id))
+            {
+                System.out.println("In the if for add method!");
+                nextRecordPos = search(dataFile, recordNum);
+
+                String comparedNum[] = record.split(" ");
+                int nextRecordId = Integer.parseInt(comparedNum[0]);
+
+                if(id < nextRecordId)
+                {
+                    nextRecordPos--;
+                }
+                if(id > nextRecordId)
+                {
+                    nextRecordPos++;
+                }
+
+                dataFile.seek(0);
+                dataFile.skipBytes(nextRecordPos * 167);
+                String slot = dataFile.readLine();
+                
+                if(slot.contains("//"))
+                {
+                    System.out.println(nextRecordPos);
+
+                    // System.out.println(nextRecord);
+                    System.out.println("Please enter in the Region, State, Code, Name, Type, and Visitors in that order.\n" + "After each field press enter");
+                    String region = input.nextLine();
+                    String state = input.nextLine();
+                    String code = input.nextLine();
+                    String name = input.nextLine(); // check to see if they add quotes
+                    name = name.replace(" ", "_");
+                    String type = input.nextLine();
+                    type = type.replace(" ", "_");
+                    String visitors = input.nextLine();
+
+                    String line = id + "," + region + "," + state + "," + code + "," + name + "," + type + "," + visitors;
+                    String newRecord = "";
+
+                    String[] lineObj = line.split(",");
+
+                    dataFile.seek(0);
+                    dataFile.skipBytes(nextRecordPos * 167);
+
+                    for(int i = 0; i < lineObj.length; i++) 
+                    {
+                        if (lineObj[i].length() < fieldSizes[i])  // Making the fields their required sizes with spaces as holders
+                        {
+                            diff = fieldSizes[i] - lineObj[i].length();
+
+                            for (int j = 0; j < diff; j++)
+                                lineObj[i] = lineObj[i] + " ";
+                        }
+
+                        if (lineObj[i].length() > fieldSizes[i]) // Making the field smaller if larger than the fieldsize
+                            lineObj[i] = lineObj[i].substring(0, fieldSizes[i]);
+                        newRecord = newRecord + lineObj[i] + " ";
+
+                    System.out.println(newRecord);
+                    
+                    }
+                    dataFile.writeBytes(newRecord + "\n");
+                    adding = false;
+                }
+                else
+                    System.out.println("THis is when I call reorganize!");
+            }
         }
-
+        else
+            System.out.println("Whoop, please open a database first");
     }
 
     // Choice 8
@@ -473,7 +592,6 @@ public class FileData {
             }
             else
                 System.out.println("record doesn't exist");
-
         } else
             System.out.println("Whoops, please open a database first\n");
     }
@@ -520,6 +638,7 @@ public class FileData {
                     break;
                 case "6":
                     database.createR();
+                    break;
                 case "7":
                     database.add();
                     break;
