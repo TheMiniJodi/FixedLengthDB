@@ -196,7 +196,7 @@ public class FileData {
                     {
                         configFile = new RandomAccessFile(databaseName + ".config", "rw");
                         dataFile = new RandomAccessFile(databaseName + ".data", "rw");
-                        System.out.println("Database is open\n");
+                        System.out.println(databaseName + " database is open\n");
                     }
                     else
                     {
@@ -205,7 +205,7 @@ public class FileData {
                     }
                 } 
                 else
-                    System.out.println("Currently, there is an opened database. You must close it before opening another." + "\n");
+                    System.out.println("Currently, there is an opened database. You must close the current database before opening another." + "\n");
             } catch (Exception e) {
                 System.out.println("Something went wrong, could not open the database");
             }
@@ -260,8 +260,8 @@ public class FileData {
                 } 
                 else 
                 {
-                    System.out.println("Could not get Record " + recordPos);
-                    System.out.println("Record out of range\n\n");
+                    System.out.println("Could not find Record " + recordPos);
+                    System.out.println("Please double check your record ID number and try again...\n\n");
                     return "";
                 }
             } catch (Exception e) {
@@ -280,10 +280,10 @@ public class FileData {
     {
         int low = 0;
         configFile.seek(0);
-        int high = Integer.parseInt(configFile.readLine()); // Grabbing the number of 
+        int high = Integer.parseInt(configFile.readLine()); // Grabbing the number 
         int middle = 0;
         boolean found = false;
-        int lookId = Integer.parseInt(ID);  // Changint the Id to a number
+        int lookId = Integer.parseInt(ID);  // Changint the ID to a number
 
 
         while (!found && (high >= low)) 
@@ -327,7 +327,7 @@ public class FileData {
                     high = middle - 1;
         }
         if (found)
-            return middle; // the record number of the record
+            return middle; // the record number
         else{
             if(adding)
                 return middle;
@@ -355,6 +355,7 @@ public class FileData {
 
     // Choice 5
     // Update a record
+    // TODO:  Need to display record after updating
     void update() throws IOException 
     {
         int recordPos;
@@ -494,7 +495,7 @@ public class FileData {
     {
         if(dataFile != null)
         {
-            System.out.println("Please enter in the Id number for the new addition");
+            System.out.println("Please enter in the ID number for the new addition");
             String recordNum = input.nextLine();
             int id = Integer.parseInt(recordNum);
             int diff = 0;
@@ -621,9 +622,9 @@ public class FileData {
         FileData database = new FileData();
 
         // Menu Choices
-        System.out.println("Welcome!" + "\n" + "Please select from the following: \n" + "1: create a new database\n"
+        System.out.println("Welcome to my file-based database!" + "\n" + "Please select from the following: \n" + "1: Create a new database\n"
                 + "2: Open Database\n" + "3: Close Database\n" + "4: Display record\n" + "5: Update record\n"
-                + "6: Create Report\n" + "7: Add record\n" + "8: Delete record\n" + "9: QUIT");
+                + "6: Create Report\n" + "7: Add record\n" + "8: Delete record\n" + "9: Quit");
 
         String menuChoice = input.nextLine();
         System.out.println("You have selected: " + menuChoice + "\n");
@@ -634,8 +635,9 @@ public class FileData {
             System.exit(0);
         }
 
-        // Recursive menu until QUIT is selected unless they choose a char then program
-        // will quit
+        // Recursive menu; must select the quit option to exit.
+        // If the user chooses a character that is not among the below choices, the program will present a messege to the user
+        // that their choice was invalid and prompt them again with the menu choices.
         while (menuChoice != "9") 
         {
             switch (menuChoice) 
@@ -665,6 +667,7 @@ public class FileData {
                     database.delete(); // Delete a record
                     break;
                 case "9":
+                    System.out.println("Goodbye....Thanks for using my file-based database :) \n");
                     System.out.println("Exiting Program..."); // Exit the program
                     if(configFile != null)
                     {
@@ -677,7 +680,7 @@ public class FileData {
                     System.out.println("Invaild Input" + "\n");
             }
 
-            System.out.println("Welcome!" + "\n" + "Please select from the following: \n" + "1: create a new database\n" + "2: Open Database\n" + "3: Close Database\n" + "4: Display record\n" + "5: Update record\n" + "6: Create Report\n" + "7: Add record\n" + "8: Delete record\n" + "9: QUIT");
+            System.out.println("Please select from the following: \n" + "1: Create a new database\n" + "2: Open Database\n" + "3: Close Database\n" + "4: Display record\n" + "5: Update record\n" + "6: Create Report\n" + "7: Add record\n" + "8: Delete record\n" + "9: Quit");
 
             menuChoice = input.nextLine();
             System.out.println("You have selected choice: " +  menuChoice + "\n");   
