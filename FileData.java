@@ -594,7 +594,7 @@ public class FileData {
         int lengthDiff = recordSize - temp.length();
         if (dataFile != null) 
         {
-            System.out.println("Please enter the Id of the record that you want to delete");
+            System.out.println("Please enter the ID of the record that you want to delete");
             String recordNum = input.nextLine();
             int recordPos = search(dataFile, recordNum);
 
@@ -606,7 +606,7 @@ public class FileData {
                 
                 for (int i = 0; i < lengthDiff; i++)
                     temp = temp + " ";
-
+                System.out.println(temp);
                 dataFile.writeBytes(temp + "\n");
                 System.out.println("Record " + recordNum + " has successfully been deleted");
                 reorganize();

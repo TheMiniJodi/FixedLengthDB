@@ -8,6 +8,6 @@ This is a simple file-based database. Currently, it is suited for only one CSV f
   * **Update a record:** <br> <blockquote>This will allow the user to update any field except for the ID of a record. The program prompts the user for the record ID number. If the record exist, the program will prompt the user for the field they would like to update. If the field does not exist it will display a messege as such. Once the user enters a vaild field, they will be asked to enter the new value (I assume that the user will enter the correct data types).</blockquote>
   * **Create a report:** <br> <blockquote>This option will display the first ten records of the database.</blockquote>
   * **Add a new record:** <br> <blockquote>Allows the user to add a new record to the file. The program will will prompt the user for the ID number of the new record. If the ID already exist it will display a messege as such. Once the user enters a vaild ID, the program will prompt the user to enter the values of the fields pressing enter after each field.</blockquote>
-  * **Delete a record:** <br> <blockquote></blockquote>
+  * **Delete a record:** <br> <blockquote>Allows the user to delete a record. The program will prompt the user for an ID number. Once entered the program will insert 'missing' in place of the record and automatically reorganize the file where there is an empty record between each real record.</blockquote>
   * **Quit:** <br> <blockquote>Terminates the program.</blockquote>
 
