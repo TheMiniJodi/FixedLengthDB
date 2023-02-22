@@ -1,6 +1,7 @@
 //Name: Jodi Mitchell
-//Date: 02/02/21
-//Description: This is a simple file database. It's build for the current fields and associated sizes: ID:10, Region:2, State:2, Code:4, Name:90, Type:40, Visitors:11. You can create, open, close a database. You may also update, add, display a record from a provided database. There is even a choice to display the first ten records of the database.
+//Last Updated: 02/22/2023
+//Description: This is a simple file database. It's build for the current fields and associated sizes: ID:10, Region:2, State:2, Code:4, Name:90, Type:40, Visitors:11. 
+//You can create, open, close a database. You may also update, add, display a record from a provided database. There is even a choice to display the first ten records of the database.
 
 import java.util.Scanner;
 import java.io.RandomAccessFile;
@@ -34,7 +35,7 @@ public class FileData {
     void createDB() 
     {
         System.out.println("Creating a new DataBase");
-        System.out.println("Please enter the name of the csv file you would like to create a database for...\n"+ "(ex: if your file is Name.csv only enter Name)");
+        System.out.println("Please enter the name of the csv file you would like to create a database for...\n"+ "(ex: If your file is fileName.csv only enter fileName)");
         String fileName = input.nextLine();
         System.out.println("You have enter in the file name: " + fileName);
         readInFile(fileName);
@@ -134,8 +135,7 @@ public class FileData {
         String line = null;
         int pos = 1;
 
-        // temp file to hold real values so real records don't get written over by new
-        // blanks
+        // temp file to hold real values so real records don't get over written by new blanks
         RandomAccessFile tempDataFile = new RandomAccessFile("temp.data", "rw");
         tempDataFile.writeBytes(writeBlank() + "\n");
 
@@ -175,6 +175,38 @@ public class FileData {
     void openAfterReOrg() throws FileNotFoundException
     {
         dataFile = new RandomAccessFile(databaseName + ".data", "rw");
+    }
+
+    // Print function 
+    String printRecord(String recordPos) throws IOException 
+    {
+        try{
+            configFile.seek(0);
+            configFile.readLine();
+            String field = configFile.readLine();
+            String [] fieldNames = field.split(" ");
+            
+            if (getRecord(dataFile, search(dataFile, recordPos))) // Does the record exists
+            {           
+                        String[] dataInfo = record.split(" ");
+                        int j = 0;
+
+                        for (int i = 0; i < dataInfo.length; i++) 
+                        {
+                            dataInfo[i] = dataInfo[i].replace('_', ' ');  // Displaying them without underscores
+                            System.out.println(fieldNames[j] + ": " + dataInfo[i] + " ");
+                            j += 2;
+                        }
+                        System.out.println("\n");
+                        return recordPos;
+            }
+       }catch (Exception e) {
+                System.out.println("Something went wrong");
+                System.exit(0);
+            }
+            return "null";
+
+            
     }
 
     // Choice 2
@@ -232,42 +264,20 @@ public class FileData {
     {
         if (dataFile != null && configFile != null) 
         {
-            try 
-            {
-                configFile.seek(0);
-                configFile.readLine();
-                String field = configFile.readLine();
-                String [] fieldNames = field.split(" ");
-
                 System.out.println("Please enter the ID of the record");
                 String recordPos = input.nextLine();
                 System.out.println("Searching..." + "\n");
 
-                if (getRecord(dataFile, search(dataFile, recordPos))) // Does the record exists
-                {
-                    System.out.println("Record found:" + "\n");
-                    String[] dataInfo = record.split(" ");
-                    int j = 0;
-
-                    for (int i = 0; i < dataInfo.length; i++) 
-                    {
-                        dataInfo[i] = dataInfo[i].replace('_', ' ');  // Displaying them without underscores
-                        System.out.println(fieldNames[j] + ": " + dataInfo[i] + " ");
-                        j += 2;
-                    }
-                    System.out.println("\n");
-                    return recordPos;
-                } 
+                String myRecord = printRecord(recordPos);
+                if(myRecord != "null"){
+                    return myRecord;
+                }
                 else 
                 {
                     System.out.println("Could not find Record " + recordPos);
                     System.out.println("Please double check your record ID number and try again...\n\n");
                     return "";
                 }
-            } catch (Exception e) {
-                System.out.println("Something went wrong");
-                System.exit(0);
-            }
         } 
         else
             System.out.println("Whoops, please open a database first\n");
@@ -283,7 +293,7 @@ public class FileData {
         int high = Integer.parseInt(configFile.readLine()); // Grabbing the number 
         int middle = 0;
         boolean found = false;
-        int lookId = Integer.parseInt(ID);  // Changint the ID to a number
+        int lookId = Integer.parseInt(ID);  // Changing the ID to an integer
 
 
         while (!found && (high >= low)) 
@@ -440,6 +450,8 @@ public class FileData {
                             temp = temp.substring(0, maxLength);
 
                         dataFile.writeBytes(temp);
+                        System.out.println("Record " + recordNum + " has been updated: \n");
+                        printRecord(recordNum); // Print the record after updating
                     }
                 }
             }
